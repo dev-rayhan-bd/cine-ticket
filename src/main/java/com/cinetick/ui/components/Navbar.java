@@ -1,5 +1,6 @@
 package com.cinetick.ui.components;
 
+import com.cinetick.ui.WindowManager;
 import com.cinetick.ui.theme.Theme;
 import javax.swing.*;
 import java.awt.*;
@@ -14,23 +15,27 @@ public class Navbar extends JPanel {
         JLabel logo = new JLabel("CINETICK PRO");
         logo.setForeground(Theme.PRIMARY_RED);
         logo.setFont(Theme.LOGO_FONT);
+        logo.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        logo.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent e) { WindowManager.showScreen("DASHBOARD"); }
+        });
         add(logo, BorderLayout.WEST);
 
-        JPanel searchBox = new JPanel(new FlowLayout(FlowLayout.RIGHT, 15, 20));
-        searchBox.setOpaque(false);
+        JPanel rightPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 15, 20));
+        rightPanel.setOpaque(false);
         
-        JTextField searchField = new JTextField(20);
-        searchField.setBackground(new Color(45, 45, 45));
-        searchField.setForeground(Color.WHITE);
-        searchField.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
-        
+        JTextField search = new JTextField(20);
+        search.setBackground(new Color(45, 45, 45));
+        search.setForeground(Color.WHITE);
+        search.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
+
         JButton loginBtn = new JButton("Login");
         loginBtn.setBackground(Theme.PRIMARY_RED);
         loginBtn.setForeground(Color.WHITE);
-        loginBtn.setFocusPainted(false);
+        loginBtn.addActionListener(e -> WindowManager.showScreen("LOGIN"));
 
-        searchBox.add(searchField);
-        searchBox.add(loginBtn);
-        add(searchBox, BorderLayout.EAST);
+        rightPanel.add(search);
+        rightPanel.add(loginBtn);
+        add(rightPanel, BorderLayout.EAST);
     }
 }
