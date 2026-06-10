@@ -1,84 +1,65 @@
 package com.cinetick.ui.screens;
 
-import com.cinetick.ui.WindowManager;
+import com.cinetick.ui.MainDashboard; // Import added
 import com.cinetick.ui.theme.Theme;
+import com.cinetick.ui.utils.ImageUtil;
 import javax.swing.*;
 import java.awt.*;
 
 public class MovieDetailsScreen extends JPanel {
-    public MovieDetailsScreen(String movieName) {
+    public MovieDetailsScreen(MainDashboard dashboard, String movieName, String imgUrl) {
         setBackground(Theme.BG_BLACK);
         setLayout(new BorderLayout());
 
-        // Header
-        JPanel header = new JPanel(new FlowLayout(FlowLayout.LEFT, 30, 20));
-        header.setOpaque(false);
-        JButton backBtn = new JButton("← Back");
-        backBtn.setForeground(Color.WHITE);
-        backBtn.setContentAreaFilled(false);
-        backBtn.addActionListener(e -> WindowManager.showScreen("DASHBOARD"));
-        header.add(backBtn);
-        add(header, BorderLayout.NORTH);
+        JPanel contentWrapper = new JPanel(new BorderLayout(50, 0));
+        contentWrapper.setOpaque(false);
+        contentWrapper.setBorder(BorderFactory.createEmptyBorder(60, 100, 60, 100));
 
-        // Content Body
-        JPanel body = new JPanel(new GridBagLayout());
-        body.setOpaque(false);
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(0, 40, 0, 40);
+        // 1. LEFT: Poster
+        JLabel poster = new JLabel();
+        poster.setPreferredSize(new Dimension(380, 550));
+        new Thread(() -> {
+            ImageIcon icon = ImageUtil.loadAndScale(imgUrl, 380, 550);
+            SwingUtilities.invokeLater(() -> poster.setIcon(icon));
+        }).start();
+        contentWrapper.add(poster, BorderLayout.WEST);
 
-        // Left: Poster Placeholder
-        JPanel poster = new JPanel();
-        poster.setPreferredSize(new Dimension(350, 500));
-        poster.setBackground(new Color(30,30,30));
-        gbc.gridx = 0; gbc.gridy = 0;
-        body.add(poster, gbc);
+        // 2. RIGHT: Info
+        JPanel infoWrapper = new JPanel();
+        infoWrapper.setLayout(new BoxLayout(infoWrapper, BoxLayout.Y_AXIS));
+        infoWrapper.setOpaque(false);
 
-        // Right: Content
-        JPanel details = new JPanel();
-        details.setLayout(new BoxLayout(details, BoxLayout.Y_AXIS));
-        details.setOpaque(false);
-        details.setPreferredSize(new Dimension(600, 500));
-
-        JLabel title = new JLabel(movieName);
-        title.setFont(new Font("Arial", Font.BOLD, 50));
+        JLabel title = new JLabel(movieName.toUpperCase());
+        title.setFont(new Font("SansSerif", Font.BOLD, 55));
         title.setForeground(Color.WHITE);
 
-        JLabel info = new JLabel("2026 | Action | 2h 30m | ⭐ 9.0");
-        info.setForeground(Theme.TEXT_GRAY);
+        JLabel desc = new JLabel("<html><body style='width: 500px; color: #BBBBBB;'>The world is on the brink of another revolution...</body></html>");
 
-        JLabel desc = new JLabel("<html><body style='width: 450px;'>A detailed description of " + movieName + " will be displayed here. Experience the high-octane action and deep emotional storytelling in CineTick Pro.</body></html>");
-        desc.setForeground(Color.LIGHT_GRAY);
-        desc.setFont(new Font("Arial", Font.PLAIN, 16));
+        // --- Buttons with Navigation ---
+        JPanel btnPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 30));
+        btnPanel.setOpaque(false);
 
-        JPanel buttons = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 30));
-        buttons.setOpaque(false);
-        
-        JButton playBtn = new JButton("▶ Watch Trailer");
-        playBtn.setPreferredSize(new Dimension(180, 50));
-        playBtn.setBackground(Color.WHITE);
-        playBtn.setForeground(Color.BLACK);
-        playBtn.addActionListener(e -> JOptionPane.showMessageDialog(this, "Initializing VLCJ Player..."));
+        JButton playBtn = new JButton("▶ WATCH TRAILER");
+        playBtn.setPreferredSize(new Dimension(200, 55));
 
-        JButton bookBtn = new JButton("Book Tickets");
-        bookBtn.setPreferredSize(new Dimension(180, 50));
+        JButton bookBtn = new JButton("BOOK TICKETS");
         bookBtn.setBackground(Theme.PRIMARY_RED);
         bookBtn.setForeground(Color.WHITE);
-        bookBtn.addActionListener(e -> WindowManager.showScreen("SEAT_SELECTION"));
+        bookBtn.setPreferredSize(new Dimension(220, 55));
 
-        buttons.add(playBtn);
-        buttons.add(Box.createRigidArea(new Dimension(20, 0)));
-        buttons.add(bookBtn);
+       
+        bookBtn.addActionListener(e -> dashboard.navigateTo("BUY_TICKETS"));
 
-        details.add(title);
-        details.add(Box.createRigidArea(new Dimension(0, 10)));
-        details.add(info);
-        details.add(Box.createRigidArea(new Dimension(0, 30)));
-        details.add(desc);
-        details.add(buttons);
+        btnPanel.add(playBtn);
+        btnPanel.add(Box.createRigidArea(new Dimension(20, 0)));
+        btnPanel.add(bookBtn);
 
-        gbc.gridx = 1;
-        body.add(details, gbc);
+        infoWrapper.add(title);
+        infoWrapper.add(Box.createRigidArea(new Dimension(0, 40)));
+        infoWrapper.add(desc);
+        infoWrapper.add(btnPanel);
 
-        add(body, BorderLayout.CENTER);
+        contentWrapper.add(infoWrapper, BorderLayout.CENTER);
+        add(contentWrapper, BorderLayout.NORTH);
     }
 }

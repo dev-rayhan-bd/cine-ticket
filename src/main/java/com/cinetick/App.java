@@ -27,12 +27,12 @@ public class App {
             // Register ALL Production Screens
             WindowManager.addScreen(new LoginScreen(), "LOGIN");
             WindowManager.addScreen(new SignupScreen(), "SIGNUP");
+            WindowManager.addScreen(new MainDashboard(), "DASHBOARD");
             WindowManager.addScreen(new ForgotPasswordScreen(), "FORGOT_PASSWORD");
             WindowManager.addScreen(new OTPVerifyScreen(), "OTP_VERIFY");
-            WindowManager.addScreen(new MainDashboard(), "DASHBOARD");
-            WindowManager.addScreen(new MovieDetailsScreen("Rockstar"), "DETAILS");
-            WindowManager.addScreen(new BookingScreen(), "SEAT_SELECTION"); // আপনার বুকিং ফ্লো স্ক্রিন
-            WindowManager.addScreen(new ProfileScreen(), "PROFILE");
+            // WindowManager.addScreen(new MovieDetailsScreen("Rockstar"), "DETAILS");
+            // WindowManager.addScreen(new BookingScreen(), "SEAT_SELECTION");
+            // WindowManager.addScreen(new ProfileScreen(), "PROFILE");
 
             // Start Flow
             WindowManager.showScreen("LOGIN");
