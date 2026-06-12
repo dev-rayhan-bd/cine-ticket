@@ -9,7 +9,19 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 public class MovieCard extends JPanel {
-    public MovieCard(MainDashboard dashboard, String title, String rating, String imgUrl) {
+    private int movieId;
+    private String title;
+    private String rating;
+    private String imgUrl;
+    private String overview;
+
+    public MovieCard(MainDashboard dashboard, int movieId, String title, String rating, String imgUrl, String overview) {
+        this.movieId = movieId;
+        this.title = title;
+        this.rating = rating;
+        this.imgUrl = imgUrl;
+        this.overview = overview;
+
         setLayout(new BorderLayout());
         setBackground(Theme.CARD_BG);
         setPreferredSize(new Dimension(210, 320));
@@ -23,17 +35,18 @@ public class MovieCard extends JPanel {
             SwingUtilities.invokeLater(() -> poster.setIcon(icon));
         }).start();
 
-        // Info Panel
+        // Details Panel
         JPanel info = new JPanel(new GridLayout(2, 1));
         info.setOpaque(false);
-        info.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        info.setBorder(BorderFactory.createEmptyBorder(8, 10, 8, 10));
 
         JLabel titleLbl = new JLabel(title);
         titleLbl.setForeground(Color.WHITE);
         titleLbl.setFont(Theme.CARD_TITLE);
         
-        JLabel rateLbl = new JLabel("⭐ " + rating);
+        JLabel rateLbl = new JLabel("\u2B50 " + rating); // Star Emoji Unicode
         rateLbl.setForeground(Color.YELLOW);
+        rateLbl.setFont(new Font("Arial", Font.PLAIN, 12));
 
         info.add(titleLbl);
         info.add(rateLbl);
@@ -41,12 +54,12 @@ public class MovieCard extends JPanel {
         add(poster, BorderLayout.CENTER);
         add(info, BorderLayout.SOUTH);
 
-     
+        // --- Interaction Logic ---
         addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-             
-                dashboard.openMovieDetails(title, imgUrl);
+      
+                dashboard.openMovieDetails(movieId, title, rating, imgUrl, overview);
             }
 
             @Override

@@ -1,5 +1,6 @@
 package com.cinetick.ui.screens;
 
+import com.cinetick.config.AppConfig;
 import com.cinetick.ui.MainDashboard;
 import com.cinetick.ui.components.*;
 import com.cinetick.ui.theme.Theme;
@@ -22,7 +23,7 @@ public class HomeView extends JPanel {
         add(title);
 
         
-        add(new MovieGrid(dashboard, 8)); 
+       add(new MovieGrid(dashboard, "NOW_PLAYING", AppConfig.LIMIT_TRENDING));
         add(Box.createVerticalStrut(100)); 
     }
 }

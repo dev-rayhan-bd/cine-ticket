@@ -13,7 +13,8 @@ target/
 .classpath
 .settings/
 bin/
-
+.env
 # OS files
 .DS_Store
 Thumbs.db
+#mvn exec:java -Dexec.mainClass="com.cinetick.App"

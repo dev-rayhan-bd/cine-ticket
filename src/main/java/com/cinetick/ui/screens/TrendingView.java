@@ -1,5 +1,6 @@
 package com.cinetick.ui.screens;
 
+import com.cinetick.config.AppConfig;
 import com.cinetick.ui.MainDashboard;
 import com.cinetick.ui.components.MovieGrid;
 import com.cinetick.ui.theme.Theme;
@@ -18,7 +19,7 @@ public class TrendingView extends JPanel {
         title.setBorder(BorderFactory.createEmptyBorder(50, 0, 30, 0));
         
         add(title);
-       add(new MovieGrid(dashboard, 10)); 
+       add(new MovieGrid(dashboard, "TRENDING", AppConfig.LIMIT_TRENDING));
         add(Box.createVerticalStrut(100));
     }
 }
