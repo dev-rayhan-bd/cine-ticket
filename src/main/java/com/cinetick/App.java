@@ -10,6 +10,10 @@ public class App {
       
         NativeLibrary.addSearchPath("libvlc", "C:\\Program Files\\VideoLAN\\VLC");
         System.setProperty("jna.library.path", "C:\\Program Files\\VideoLAN\\VLC");
+
+
+        
+        
 // C:\Program Files\VideoLAN\VLC
         try { 
             UIManager.setLookAndFeel(new FlatDarkLaf()); 

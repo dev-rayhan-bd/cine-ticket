@@ -55,13 +55,22 @@ public class MovieDetailsScreen extends JPanel {
         playBtn.setFont(new Font("SansSerif", Font.BOLD, 14));
         playBtn.setCursor(new Cursor(Cursor.HAND_CURSOR));
         
-        playBtn.addActionListener(e -> {
-            new Thread(() -> {
-                String key = TMDBService.getTrailerUrl(id);
-                dashboard.playTrailer(key);
-            }).start();
-        });
-
+        // playBtn.addActionListener(e -> {
+        //     new Thread(() -> {
+        //         String key = TMDBService.getTrailerUrl(id);
+        //         dashboard.playTrailer(key);
+        //     }).start();
+        // });
+playBtn.addActionListener(e -> {
+    // ১. TMDB ID টি নিন
+    int tmdbId = id; 
+    
+    // ২. স্ট্রিমিং ইউআরএল জেনারেট করুন (ইউটিউব ছাড়া)
+    String streamUrl = TMDBService.getLiveStreamingUrl(tmdbId, false);
+    
+    // ৩. প্লেয়ারে পাঠিয়ে দিন
+    dashboard.playTrailer(streamUrl); // এখন এটি সরাসরি স্ট্রীম প্লে করবে
+});
         JButton bookBtn = new JButton("BOOK TICKETS");
         bookBtn.setBackground(Theme.PRIMARY_RED);
         bookBtn.setForeground(Color.WHITE);

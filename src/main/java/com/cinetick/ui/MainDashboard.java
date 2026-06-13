@@ -69,16 +69,16 @@ public class MainDashboard extends JPanel {
     }
 
     // --- REAL TRAILER LOGIC: Plays INSIDE the app ---
-    public void playTrailer(String trailerKey) {
-        if (trailerKey == null || trailerKey.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Trailer not available!");
-            return;
-        }
-        String youtubeUrl = "https://www.youtube.com/watch?v=" + trailerKey;
-        contentRouter.show(centerCardPanel, "VIDEO_PLAYER");
-        videoPlayer.playVideo(youtubeUrl);
-    }
 
+public void playTrailer(String streamUrl) {
+    if (streamUrl == null) {
+        JOptionPane.showMessageDialog(this, "Trailer not found!");
+        return;
+    }
+  
+    contentRouter.show(centerCardPanel, "VIDEO_PLAYER");
+    videoPlayer.playVideo(streamUrl);
+}
     private JScrollPane wrapInScroll(JPanel panel) {
         JScrollPane scroll = new JScrollPane(panel);
         scroll.setBorder(null);

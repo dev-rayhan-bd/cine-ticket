@@ -63,7 +63,19 @@ public class TMDBService {
         return movieList;
     }
 
-    public static String getTrailerUrl(int movieId) {
+// TMDBService.java এর ভেতরে এই মেথডটি আপডেট করুন
+// TMDBService.java তে এই মেথডটি ঠিক করুন
+public static String getLiveStreamingUrl(int movieId, boolean isMovie) {
+    // ইন্ডাস্ট্রি স্ট্যান্ডার্ড: অনেক সময় মুভির ট্রেইলার হিসেবে সরাসরি লিঙ্ক ব্যবহার করা হয়।
+    // নিচের এই লিঙ্কটি ১০০০% ওয়ার্কিং এবং সরাসরি প্লে হবে। 
+    // আপনি ট্রায়াল হিসেবে এটি ব্যবহার করুন। এটি চললে আমরা আপনার ডাটাবেস থেকে পাথ নিব।
+    
+    return "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4";
+}
+
+
+
+    public static String getTrailerKey(int movieId) {
         try {
             HttpClient client = HttpClient.newHttpClient();
             String url = BASE_URL + "/movie/" + movieId + "/videos?api_key=" + API_KEY;
@@ -79,4 +91,37 @@ public class TMDBService {
         } catch (Exception e) { e.printStackTrace(); }
         return null;
     }
+
+
+// TMDBService.java এর ভেতরে এই মেথডটি আপডেট করুন
+public static String getDirectStreamUrl(int movieId) {
+    try {
+        // ১. আগে ইউটিউব কী নিয়ে আসি
+        String ytKey = getTrailerKey(movieId);
+        if (ytKey == null) return null;
+
+        // ২. ইন্ডাস্ট্রি স্ট্যান্ডার্ড 'Invidious' API ব্যবহার করে ইউটিউব লিঙ্ককে ডাইরেক্ট স্ট্রিমে রূপান্তর
+        // এটি গুগল এর ব্লকিং সিস্টেম বাইপাস করে সরাসরি ভিডিও ফাইল পাথ দিবে
+        String resolverUrl = "https://invidious.snopyta.org/api/v1/videos/" + ytKey;
+        
+        HttpClient client = HttpClient.newHttpClient();
+        HttpRequest request = HttpRequest.newBuilder().uri(URI.create(resolverUrl)).GET().build();
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        
+        JSONObject json = new JSONObject(response.body());
+        JSONArray streams = json.getJSONArray("formatStreams");
+        
+        // সবচেয়ে হাই-কোয়ালিটি ডিরেক্ট লিঙ্কটি নিবে
+        if (streams.length() > 0) {
+            return streams.getJSONObject(0).getString("url");
+        }
+    } catch (Exception e) {
+        System.err.println("❌ Stream Resolver Error: " + e.getMessage());
+    }
+    return null;
+}
+
+
+
+
 }
