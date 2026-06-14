@@ -1,7 +1,6 @@
 package com.cinetick.ui.components;
 
 import com.cinetick.ui.MainDashboard;
-import com.cinetick.ui.theme.Theme;
 import com.cinetick.ui.utils.ImageUtil;
 import com.cinetick.service.TMDBService;
 import com.cinetick.models.Movie;

@@ -1,5 +1,7 @@
 package com.cinetick.ui.screens;
 
+import com.cinetick.dao.UserDAO;
+import com.cinetick.models.User;
 import com.cinetick.ui.WindowManager;
 import com.cinetick.ui.theme.Theme;
 import com.cinetick.ui.utils.ImageUtil;
@@ -9,6 +11,8 @@ import java.io.File;
 
 public class SignupScreen extends JPanel {
     private JLabel imgPreview;
+    private File selectedImage;
+    public static String lastRegisteredEmail = ""; 
 
     public SignupScreen() {
         setBackground(Theme.BG_BLACK);
@@ -25,7 +29,7 @@ public class SignupScreen extends JPanel {
         title.setForeground(Color.WHITE);
         title.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        // --- Profile Image Preview Section ---
+        // --- Profile Image Section ---
         imgPreview = new JLabel("No Image", SwingConstants.CENTER);
         imgPreview.setPreferredSize(new Dimension(120, 120));
         imgPreview.setMaximumSize(new Dimension(120, 120));
@@ -37,9 +41,9 @@ public class SignupScreen extends JPanel {
         uploadBtn.addActionListener(e -> {
             JFileChooser chooser = new JFileChooser();
             if (chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
-                File file = chooser.getSelectedFile();
+                selectedImage = chooser.getSelectedFile();
                 imgPreview.setText("");
-                imgPreview.setIcon(ImageUtil.fromFile(file, 120, 120));
+                imgPreview.setIcon(ImageUtil.fromFile(selectedImage, 120, 120));
             }
         });
 
@@ -53,7 +57,29 @@ public class SignupScreen extends JPanel {
         signupBtn.setBackground(Theme.PRIMARY_RED);
         signupBtn.setForeground(Color.WHITE);
         signupBtn.setMaximumSize(new Dimension(400, 55));
-        signupBtn.addActionListener(e -> WindowManager.showScreen("OTP_VERIFY"));
+        
+        // --- LOGIC START ---
+        signupBtn.addActionListener(e -> {
+            String emailTxt = email.getText();
+            String nameTxt = name.getText();
+            String passTxt = new String(pass.getPassword());
+            String picPath = (selectedImage != null) ? selectedImage.getAbsolutePath() : "";
+
+            if (emailTxt.isEmpty() || passTxt.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Fields cannot be empty!");
+                return;
+            }
+
+            lastRegisteredEmail = emailTxt; // ওটিপি স্ক্রিনের জন্য ইমেইল সেভ করা হলো
+            User u = new User(nameTxt, emailTxt, passTxt, picPath);
+            
+            if (UserDAO.register(u)) {
+                JOptionPane.showMessageDialog(this, "OTP Sent! Please check your VS Code Terminal.");
+                WindowManager.showScreen("OTP_VERIFY");
+            } else {
+                JOptionPane.showMessageDialog(this, "Email already exists or DB Error!");
+            }
+        });
 
         card.add(title); card.add(Box.createRigidArea(new Dimension(0, 20)));
         card.add(imgPreview); card.add(Box.createRigidArea(new Dimension(0, 10)));

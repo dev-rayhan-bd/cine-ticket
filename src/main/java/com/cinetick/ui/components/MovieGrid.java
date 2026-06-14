@@ -19,7 +19,11 @@ public class MovieGrid extends JPanel {
         setupUI();
         loadData(() -> TMDBService.getFilteredMovies(genreId, countryCode, limit), dashboard);
     }
-
+public MovieGrid(MainDashboard dashboard, String searchQuery) {
+    setupUI();
+   
+    loadData(() -> TMDBService.searchMovies(searchQuery, 40), dashboard);
+}
     private void setupUI() {
         setOpaque(false);
         setLayout(new GridLayout(0, 5, 25, 35));

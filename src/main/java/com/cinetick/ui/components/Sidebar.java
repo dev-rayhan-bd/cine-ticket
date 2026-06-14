@@ -36,15 +36,22 @@ public class Sidebar extends JPanel {
         setActiveItem("Home");
     }
 
-    public void setActiveItem(String activeItem) {
-        for (JButton btn : buttons) {
-            if (btn.getText().trim().equals(activeItem)) {
-                btn.setForeground(Color.WHITE);
-                btn.setBorder(BorderFactory.createMatteBorder(0, 5, 0, 0, Theme.PRIMARY_RED));
-            } else {
-                btn.setForeground(Theme.TEXT_GRAY);
-                btn.setBorder(BorderFactory.createEmptyBorder(0, 25, 0, 0));
-            }
+public void setActiveItem(String activeItem) {
+    for (JButton btn : buttons) {
+        String btnText = btn.getText().trim();
+        if (btnText.equals(activeItem)) {
+            btn.setForeground(Color.WHITE);
+            btn.setFont(new Font("SansSerif", Font.BOLD, 18));
+            // বাম পাশে একটি লাল দাগ (Indication)
+            btn.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createMatteBorder(0, 5, 0, 0, Theme.PRIMARY_RED),
+                BorderFactory.createEmptyBorder(0, 20, 0, 0)
+            ));
+        } else {
+            btn.setForeground(Theme.TEXT_GRAY);
+            btn.setFont(new Font("SansSerif", Font.PLAIN, 17));
+            btn.setBorder(BorderFactory.createEmptyBorder(0, 25, 0, 0));
         }
     }
+}
 }

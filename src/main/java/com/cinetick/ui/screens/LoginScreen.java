@@ -25,10 +25,14 @@ public class LoginScreen extends JPanel {
 
         JTextField emailField = new JTextField();
         emailField.setMaximumSize(new Dimension(320, 50));
+        emailField.setBackground(new Color(50, 50, 50));
+        emailField.setForeground(Color.WHITE);
         emailField.setBorder(BorderFactory.createTitledBorder(null, "Email", 0, 0, null, Color.GRAY));
 
         JPasswordField passField = new JPasswordField();
         passField.setMaximumSize(new Dimension(320, 50));
+        passField.setBackground(new Color(50, 50, 50));
+        passField.setForeground(Color.WHITE);
         passField.setBorder(BorderFactory.createTitledBorder(null, "Password", 0, 0, null, Color.GRAY));
 
         JButton loginBtn = new JButton("Sign In");
@@ -36,7 +40,30 @@ public class LoginScreen extends JPanel {
         loginBtn.setBackground(Theme.PRIMARY_RED);
         loginBtn.setForeground(Color.WHITE);
         loginBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
-        loginBtn.addActionListener(e -> WindowManager.showScreen("DASHBOARD"));
+        
+      loginBtn.addActionListener(e -> {
+    String email = emailField.getText();
+    String pass = new String(passField.getPassword());
+    
+  
+    com.cinetick.models.User user = com.cinetick.dao.UserDAO.login(email, pass);
+    
+if (user != null) {
+    com.cinetick.service.AuthSession.login(user);
+    
+    
+    com.cinetick.ui.MainDashboard dashboard = (com.cinetick.ui.MainDashboard) 
+        com.cinetick.ui.WindowManager.getScreen("DASHBOARD");
+    
+    if (dashboard != null) {
+        dashboard.refreshNavbar();
+    }
+    
+    com.cinetick.ui.WindowManager.showScreen("DASHBOARD");
+} else {
+        JOptionPane.showMessageDialog(this, "Login Failed! Verify email or credentials.");
+    }
+});
 
         JLabel forgotPass = new JLabel("Forgot password?");
         forgotPass.setForeground(Color.GRAY);

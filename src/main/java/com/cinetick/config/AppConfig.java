@@ -6,7 +6,7 @@ public class AppConfig {
     public static final int LIMIT_MOVIES = 800;
     public static final int LIMIT_TV_SHOWS = 85;
     public static final int LIMIT_TRENDING = 15;
-    public static final int LIMIT_COMING_SOON = 51;
+    public static final int LIMIT_COMING_SOON = 500;
 
     // TMDB Categories (Avoid strings in views)
     public static final String CAT_NOW_PLAYING = "NOW_PLAYING";

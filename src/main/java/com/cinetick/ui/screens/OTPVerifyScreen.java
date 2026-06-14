@@ -1,5 +1,60 @@
+// package com.cinetick.ui.screens;
+
+// import com.cinetick.ui.WindowManager;
+// import com.cinetick.ui.theme.Theme;
+// import javax.swing.*;
+// import java.awt.*;
+
+// public class OTPVerifyScreen extends JPanel {
+//     public OTPVerifyScreen() {
+//         setBackground(Theme.BG_BLACK);
+//         setLayout(new GridBagLayout());
+
+//         JPanel card = new JPanel();
+//         card.setPreferredSize(new Dimension(450, 500));
+//         card.setBackground(Theme.NAVBAR_BG);
+//         card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
+//         card.setBorder(BorderFactory.createEmptyBorder(50, 40, 50, 40));
+
+//         JLabel icon = new JLabel("🔒"); // Security Icon
+//         icon.setFont(new Font("Arial", Font.PLAIN, 50));
+//         icon.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+//         JLabel title = new JLabel("Verify Identity");
+//         title.setFont(new Font("Arial", Font.BOLD, 28));
+//         title.setForeground(Color.WHITE);
+//         title.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+//         JLabel sub = new JLabel("<html><center>We've sent a 6-digit code to your email.<br>Please enter it below to continue.</center></html>");
+//         sub.setForeground(Color.GRAY);
+//         sub.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+//         JTextField otpInput = new JTextField();
+//         otpInput.setMaximumSize(new Dimension(300, 60));
+//         otpInput.setHorizontalAlignment(JTextField.CENTER);
+//         otpInput.setFont(new Font("Monospaced", Font.BOLD, 35));
+//         otpInput.setBackground(new Color(30,30,30));
+//         otpInput.setForeground(Theme.PRIMARY_RED);
+//         otpInput.setBorder(BorderFactory.createLineBorder(Color.DARK_GRAY, 1));
+
+//         JButton verifyBtn = new JButton("VERIFY CODE");
+//         verifyBtn.setMaximumSize(new Dimension(350, 55));
+//         verifyBtn.setBackground(Theme.PRIMARY_RED);
+//         verifyBtn.setForeground(Color.WHITE);
+//         verifyBtn.addActionListener(e -> WindowManager.showScreen("DASHBOARD"));
+
+//         card.add(icon); card.add(Box.createRigidArea(new Dimension(0, 15)));
+//         card.add(title); card.add(Box.createRigidArea(new Dimension(0, 10)));
+//         card.add(sub); card.add(Box.createRigidArea(new Dimension(0, 50)));
+//         card.add(otpInput); card.add(Box.createRigidArea(new Dimension(0, 50)));
+//         card.add(verifyBtn);
+
+//         add(card);
+//     }
+// }
 package com.cinetick.ui.screens;
 
+import com.cinetick.dao.UserDAO;
 import com.cinetick.ui.WindowManager;
 import com.cinetick.ui.theme.Theme;
 import javax.swing.*;
@@ -16,7 +71,7 @@ public class OTPVerifyScreen extends JPanel {
         card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
         card.setBorder(BorderFactory.createEmptyBorder(50, 40, 50, 40));
 
-        JLabel icon = new JLabel("🔒"); // Security Icon
+        JLabel icon = new JLabel("🔒");
         icon.setFont(new Font("Arial", Font.PLAIN, 50));
         icon.setAlignmentX(Component.CENTER_ALIGNMENT);
 
@@ -25,7 +80,7 @@ public class OTPVerifyScreen extends JPanel {
         title.setForeground(Color.WHITE);
         title.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        JLabel sub = new JLabel("<html><center>We've sent a 6-digit code to your email.<br>Please enter it below to continue.</center></html>");
+        JLabel sub = new JLabel("<html><center>We've sent a 6-digit code to your email.<br>Check Terminal below to continue.</center></html>");
         sub.setForeground(Color.GRAY);
         sub.setAlignmentX(Component.CENTER_ALIGNMENT);
 
@@ -41,7 +96,15 @@ public class OTPVerifyScreen extends JPanel {
         verifyBtn.setMaximumSize(new Dimension(350, 55));
         verifyBtn.setBackground(Theme.PRIMARY_RED);
         verifyBtn.setForeground(Color.WHITE);
-        verifyBtn.addActionListener(e -> WindowManager.showScreen("DASHBOARD"));
+        
+        verifyBtn.addActionListener(e -> {
+            if (UserDAO.verifyOTP(SignupScreen.lastRegisteredEmail, otpInput.getText())) {
+                JOptionPane.showMessageDialog(this, "Success! Account Verified.");
+                WindowManager.showScreen("DASHBOARD");
+            } else {
+                JOptionPane.showMessageDialog(this, "Invalid OTP! Please check terminal.");
+            }
+        });
 
         card.add(icon); card.add(Box.createRigidArea(new Dimension(0, 15)));
         card.add(title); card.add(Box.createRigidArea(new Dimension(0, 10)));
