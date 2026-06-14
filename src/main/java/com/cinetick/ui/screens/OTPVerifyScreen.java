@@ -55,17 +55,17 @@ public class OTPVerifyScreen extends JPanel {
             String code = otpInput.getText().trim();
 
             if (UserDAO.verifyOTP(email, code)) {
-                // ১. ডাটাবেস থেকে ইউজারের পূর্ণাঙ্গ ডাটা নিয়ে আসা
+              
                 User user = UserDAO.getUserByEmail(email);
                 
                 if (user != null) {
-                    // ২. সেশনে ইউজারকে সেট করা (লগইন করানো)
+                 
                     AuthSession.login(user);
                     
-                    // ৩. ড্যাশবোর্ড অবজেক্টটি খুঁজে বের করে ন্যাভবার রিফ্রেশ করা
+                  
                     MainDashboard dashboard = (MainDashboard) WindowManager.getScreen("DASHBOARD");
                     if (dashboard != null) {
-                        dashboard.refreshNavbar(); // এটি এখন নাম ও গোল ছবি আপডেট করবে
+                        dashboard.refreshNavbar(); 
                     }
 
                     JOptionPane.showMessageDialog(this, "Verification Success! Welcome " + user.name);

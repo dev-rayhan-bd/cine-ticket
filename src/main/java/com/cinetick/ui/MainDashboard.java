@@ -25,6 +25,8 @@ navbar = new Navbar();
 
         videoPlayer = new VideoPlayerScreen(this);
         centerCardPanel.add(wrapInScroll(new HomeView(this)), "HOME");
+             centerCardPanel.add(wrapInScroll(new ComingSoonView(this)), "COMING_SOON");
+        centerCardPanel.add(wrapInScroll(new ShowTimesView(this)), "SHOW_TIMES");
         centerCardPanel.add(wrapInScroll(new MoviesView(this)), "MOVIES");
         centerCardPanel.add(wrapInScroll(new TVShowsView(this)), "TV_SHOWS");
         centerCardPanel.add(wrapInScroll(new TrendingView(this )), "TRENDING");
@@ -40,9 +42,20 @@ navbar = new Navbar();
             navbar.refreshAuthUI();
         }
     }
-    public void navigateTo(String name) {
+   public void navigateTo(String name) {
         contentRouter.show(centerCardPanel, name);
-        if (sidebar != null) sidebar.setActiveItem(name);
+      
+        if (sidebar != null) {
+            String activeLabel = switch(name) {
+                case "HOME", "COMING_SOON", "SHOW_TIMES", "BUY_TICKETS" -> "Home";
+                case "MOVIES" -> "Movies";
+                case "TV_SHOWS" -> "TV Shows";
+                case "TRENDING" -> "Trending";
+                case "PROFILE" -> "Profile";
+                default -> "";
+            };
+            sidebar.setActiveItem(activeLabel);
+        }
     }
 
     public void openMovieDetails(int id, String title, String rating, String img, String overview) {
@@ -50,10 +63,13 @@ navbar = new Navbar();
         contentRouter.show(centerCardPanel, "DETAILS_TEMP");
     }
 
-    public void playTrailer(String key) {
-        contentRouter.show(centerCardPanel, "VIDEO_PLAYER");
-        videoPlayer.playVideo("https://www.youtube.com/watch?v=" + key);
-    }
+public void playTrailer(String movieId) {
+ String localPath = "E:\\Video\\trailer.mp4"; 
+    
+    contentRouter.show(centerCardPanel, "VIDEO_PLAYER");
+    
+    videoPlayer.playVideo(localPath);
+}
 
     private JScrollPane wrapInScroll(JPanel panel) {
         JScrollPane scroll = new JScrollPane(panel);
@@ -73,7 +89,8 @@ navbar = new Navbar();
             case "Profile" -> navigateTo("PROFILE");
         }
     }
-
+ 
+ 
 public void performSearch(String query) {
    
     JPanel searchResultPage = new JPanel();
@@ -95,5 +112,22 @@ public void performSearch(String query) {
 }
 
 
+public void toggleLayoutForPlayer(boolean full) {
+    if (sidebar != null) {
+        sidebar.setVisible(!full);
+    }
+    
+  
+    LayoutManager layout = getLayout();
+    if (layout instanceof BorderLayout) {
+        Component north = ((BorderLayout) layout).getLayoutComponent(BorderLayout.NORTH);
+        if (north != null) {
+            north.setVisible(!full);
+        }
+    }
+    
+    revalidate();
+    repaint();
+}
 
 }

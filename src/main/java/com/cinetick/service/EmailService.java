@@ -10,7 +10,7 @@ public class EmailService {
     private static final String SENDER_EMAIL = dotenv.get("MAIL_USERNAME");
     private static final String SENDER_PASS = dotenv.get("MAIL_PASSWORD");
     
-    // লোগো ইউআরএল (Cloudinary)
+  
     private static final String LOGO_URL = "https://res.cloudinary.com/dffzmnts9/image/upload/v1781444387/CineTick_ekrjzp.png";
 
     public static void sendOTP(String recipientEmail, String userName, String otp) {
@@ -19,7 +19,7 @@ public class EmailService {
         props.put("mail.smtp.starttls.enable", "true");
         props.put("mail.smtp.host", "smtp.gmail.com");
         props.put("mail.smtp.port", "587");
-        // ডিবাগ অন করা হলো যাতে টার্মিনালে এরর ডিটেইলস দেখা যায়
+      
         // props.put("mail.debug", "true"); 
 
         Session session = Session.getInstance(props, new Authenticator() {
@@ -31,13 +31,12 @@ public class EmailService {
 
         try {
             MimeMessage message = new MimeMessage(session);
-            // নামসহ সেন্ডার (স্প্যাম ফিল্টার কমাতে সাহায্য করে)
+        
             message.setFrom(new InternetAddress(SENDER_EMAIL, "CineTick Pro Team"));
             message.setReplyTo(new Address[]{new InternetAddress(SENDER_EMAIL)});
             
             message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(recipientEmail));
-            
-            // সাবজেক্ট লাইন পরিবর্তন (আরও হিউম্যান মনে হবে)
+     
             message.setSubject("Welcome to CineTick Pro, " + userName + "! Your security code is " + otp);
 
             // --- Simplified & Modern HTML Template ---
