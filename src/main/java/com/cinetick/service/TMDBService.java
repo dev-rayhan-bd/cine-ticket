@@ -25,15 +25,20 @@ public class TMDBService {
     }
 
 
-    public static List<Movie> getFilteredMovies(int genreId, String countryCode, int limit) {
+    public static List<Movie> getFilteredMovies(int genreId, String langCode, int limit) {
+         String genreParam = (genreId > 0) ? "&with_genres=" + genreId : "";
+        String langParam = (langCode != null && !langCode.isEmpty()) ? "&with_original_language=" + langCode : "";
+        
         String endpoint = "/discover/movie?api_key=" + API_KEY 
-                        + "&with_genres=" + (genreId == 0 ? "" : genreId) 
-                        + "&region=" + countryCode;
+                        + genreParam 
+                        + langParam 
+                        + "&sort_by=popularity.desc";
         return fetchMovies(endpoint, limit);
     }
 
     private static List<Movie> fetchMovies(String urlWithParams, int limit) {
         List<Movie> movieList = new ArrayList<>();
+
         try {
             HttpClient client = HttpClient.newHttpClient();
             int page = 1;

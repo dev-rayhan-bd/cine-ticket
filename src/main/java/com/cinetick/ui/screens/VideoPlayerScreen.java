@@ -5,100 +5,122 @@ import com.cinetick.ui.theme.Theme;
 import uk.co.caprica.vlcj.player.component.EmbeddedMediaPlayerComponent;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.*;
 
 public class VideoPlayerScreen extends JPanel {
     private EmbeddedMediaPlayerComponent mediaPlayer;
     private MainDashboard dashboard;
-    private JSlider seekSlider;
+    private JSlider seekSlider, volSlider;
     private JLabel timeLabel;
+    private JButton playPauseBtn, fsBtn;
     private boolean isDragging = false;
+    private boolean isFullScreen = false;
 
     public VideoPlayerScreen(MainDashboard dashboard) {
         this.dashboard = dashboard;
         setBackground(Color.BLACK);
         setLayout(new BorderLayout());
 
-        // ১. VLCJ Player Initialization
+       
         mediaPlayer = new EmbeddedMediaPlayerComponent();
         add(mediaPlayer, BorderLayout.CENTER);
 
-        // ২. Top Bar (Close Button)
-        JPanel topBar = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        topBar.setOpaque(false);
-        JButton closeBtn = new JButton("✕ CLOSE TRAILER");
-        closeBtn.setBackground(Theme.PRIMARY_RED);
-        closeBtn.setForeground(Color.WHITE);
-        closeBtn.addActionListener(e -> {
-            mediaPlayer.mediaPlayer().controls().stop();
-            dashboard.navigateTo("HOME");
-        });
-        topBar.add(closeBtn);
-        add(topBar, BorderLayout.NORTH);
-
-        // ৩. Bottom Control Bar
-        add(createControlPanel(), BorderLayout.SOUTH);
-
-        // ৪. UI আপডেট করার টাইমার (প্রতি সেকেন্ডে একবার চলবে)
-        Timer timer = new Timer(1000, e -> refreshPlayerStatus()); // নাম পরিবর্তন করা হয়েছে
-        timer.start();
-    }
-
-    private JPanel createControlPanel() {
-        JPanel p = new JPanel(new BorderLayout(10, 10));
-        p.setBackground(new Color(20, 20, 20));
-        p.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
-
-        // Seek Bar
+        JPanel bottomPanel = new JPanel();
+        bottomPanel.setLayout(new BoxLayout(bottomPanel, BoxLayout.Y_AXIS));
+        bottomPanel.setBackground(new Color(15, 15, 15));
+        
+        
         seekSlider = new JSlider(0, 1000, 0);
         seekSlider.setOpaque(false);
-        seekSlider.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mousePressed(java.awt.event.MouseEvent e) { isDragging = true; }
-            public void mouseReleased(java.awt.event.MouseEvent e) {
+        seekSlider.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        seekSlider.addMouseListener(new MouseAdapter() {
+            public void mousePressed(MouseEvent e) { isDragging = true; }
+            public void mouseReleased(MouseEvent e) {
                 float pos = seekSlider.getValue() / 1000.0f;
                 mediaPlayer.mediaPlayer().controls().setPosition(pos);
                 isDragging = false;
             }
         });
-        p.add(seekSlider, BorderLayout.NORTH);
+        bottomPanel.add(seekSlider);
 
-        // Left: Play/Pause & Time
-        JPanel left = new JPanel(new FlowLayout(FlowLayout.LEFT, 15, 0));
-        left.setOpaque(false);
-        JButton playBtn = new JButton("⏯");
-        playBtn.addActionListener(e -> mediaPlayer.mediaPlayer().controls().pause());
+        JPanel controls = new JPanel(new BorderLayout(15, 0));
+        controls.setOpaque(false);
+        controls.setBorder(BorderFactory.createEmptyBorder(5, 20, 10, 20));
+
+      
+        JPanel leftGroup = new JPanel(new FlowLayout(FlowLayout.LEFT, 20, 0));
+        leftGroup.setOpaque(false);
+
+        playPauseBtn = new JButton("PAUSE"); 
+        playPauseBtn.setFont(new Font("Arial", Font.BOLD, 12));
+        playPauseBtn.setPreferredSize(new Dimension(100, 35));
+        playPauseBtn.addActionListener(e -> {
+            mediaPlayer.mediaPlayer().controls().pause();
+            playPauseBtn.setText(mediaPlayer.mediaPlayer().status().isPlaying() ? "PAUSE" : "PLAY");
+        });
+
         timeLabel = new JLabel("00:00 / 00:00");
         timeLabel.setForeground(Color.WHITE);
-        left.add(playBtn); left.add(timeLabel);
-        p.add(left, BorderLayout.WEST);
+        timeLabel.setFont(new Font("Monospaced", Font.BOLD, 14));
 
-        // Right: Volume
-        JSlider volSlider = new JSlider(0, 100, 80);
-        volSlider.setPreferredSize(new Dimension(100, 20));
+        leftGroup.add(playPauseBtn);
+        leftGroup.add(timeLabel);
+        controls.add(leftGroup, BorderLayout.WEST);
+
+        JPanel rightGroup = new JPanel(new FlowLayout(FlowLayout.RIGHT, 20, 0));
+        rightGroup.setOpaque(false);
+
+        volSlider = new JSlider(0, 100, 80);
+        volSlider.setPreferredSize(new Dimension(120, 35));
         volSlider.setOpaque(false);
         volSlider.addChangeListener(e -> mediaPlayer.mediaPlayer().audio().setVolume(volSlider.getValue()));
-        p.add(volSlider, BorderLayout.EAST);
 
-        return p;
+        fsBtn = new JButton("FULLSCREEN [⛶]");
+        fsBtn.addActionListener(e -> toggleFullScreen());
+
+        rightGroup.add(new JLabel("<html><b style='color:white;'>VOL:</b></html>"));
+        rightGroup.add(volSlider);
+        rightGroup.add(fsBtn);
+        controls.add(rightGroup, BorderLayout.EAST);
+
+        bottomPanel.add(controls);
+        add(bottomPanel, BorderLayout.SOUTH);
+
+        JButton closeBtn = new JButton("✕ CLOSE TRAILER");
+        closeBtn.setBackground(Theme.PRIMARY_RED);
+        closeBtn.setForeground(Color.WHITE);
+        closeBtn.addActionListener(e -> {
+            mediaPlayer.mediaPlayer().controls().stop();
+            if (isFullScreen) toggleFullScreen();
+            dashboard.navigateTo("HOME");
+        });
+        JPanel top = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        top.setBackground(Color.BLACK);
+        top.add(closeBtn);
+        add(top, BorderLayout.NORTH);
+
+      
+        new Timer(1000, e -> refreshStatus()).start();
     }
 
-    private void refreshPlayerStatus() { // মেথড এর নাম ফিক্স করা হয়েছে
+    private void toggleFullScreen() {
+        isFullScreen = !isFullScreen;
+        fsBtn.setText(isFullScreen ? "EXIT FULLSCREEN" : "FULLSCREEN [⛶]");
+        dashboard.toggleLayoutForPlayer(isFullScreen); 
+    }
+
+    private void refreshStatus() {
         if (!mediaPlayer.mediaPlayer().status().isPlaying() || isDragging) return;
         
         float pos = mediaPlayer.mediaPlayer().status().position();
         seekSlider.setValue((int) (pos * 1000));
-
-        long current = mediaPlayer.mediaPlayer().status().time() / 1000;
-        long total = mediaPlayer.mediaPlayer().status().length() / 1000;
-        timeLabel.setText(formatTime(current) + " / " + formatTime(total));
-    }
-
-    private String formatTime(long s) {
-        if (s < 0) return "00:00";
-        return String.format("%02d:%02d", s / 60, s % 60);
+        
+        long cur = mediaPlayer.mediaPlayer().status().time() / 1000;
+        long tot = mediaPlayer.mediaPlayer().status().length() / 1000;
+        timeLabel.setText(String.format("%02d:%02d / %02d:%02d", cur/60, cur%60, tot/60, tot%60));
     }
 
     public void playVideo(String url) {
-        System.out.println("🎥 Streaming: " + url);
         mediaPlayer.mediaPlayer().media().play(url);
     }
 }

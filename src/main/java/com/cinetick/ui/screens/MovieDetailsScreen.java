@@ -8,81 +8,96 @@ import javax.swing.*;
 import java.awt.*;
 
 public class MovieDetailsScreen extends JPanel {
+    private Image backdropImage;
+
     public MovieDetailsScreen(MainDashboard dashboard, int id, String name, String rating, String img, String overview) {
         setBackground(Theme.BG_BLACK);
-        setLayout(new GridBagLayout()); 
-        setBorder(BorderFactory.createEmptyBorder(60, 100, 60, 100));
+        setLayout(new BorderLayout());
+//(Netflix Effect)
+        new Thread(() -> {
+            ImageIcon icon = ImageUtil.loadAndScale(img, 1920, 1080);
+            if (icon != null) {
+                backdropImage = icon.getImage();
+                repaint();
+            }
+        }).start();
 
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.fill = GridBagConstraints.BOTH;
-        gbc.anchor = GridBagConstraints.NORTHWEST;
+        JPanel mainWrapper = new JPanel(new BorderLayout(50, 0)) { // ৫-পিক্সেল গ্যাপ পোস্টার ও টেক্সটের মাঝে
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                if (backdropImage != null) {
+                    g2.drawImage(backdropImage, 0, 0, getWidth(), getHeight(), null);
+                }
+    
+                GradientPaint gp = new GradientPaint(0, 0, new Color(5, 5, 5, 180), 
+                                                    0, getHeight(), new Color(5, 5, 5, 255));
+                g2.setPaint(gp);
+                g2.fillRect(0, 0, getWidth(), getHeight());
+                g2.dispose();
+            }
+        };
+        mainWrapper.setOpaque(false);
+        mainWrapper.setBorder(BorderFactory.createEmptyBorder(60, 80, 60, 80));
 
-        // 1. LEFT: Movie Poster
+   
         JLabel poster = new JLabel();
         poster.setPreferredSize(new Dimension(380, 550));
+        poster.setBorder(BorderFactory.createLineBorder(new Color(255, 255, 255, 30), 1)); // হালকা বর্ডার
         new Thread(() -> {
             ImageIcon icon = ImageUtil.loadAndScale(img, 380, 550);
             SwingUtilities.invokeLater(() -> poster.setIcon(icon));
         }).start();
-        
-        gbc.gridx = 0; gbc.gridy = 0;
-        gbc.weightx = 0;
-        gbc.insets = new Insets(0, 0, 0, 50); // Small gap between poster and text
-        add(poster, gbc);
+        mainWrapper.add(poster, BorderLayout.WEST);
 
-        // 2. RIGHT: Content Panel
         JPanel infoPanel = new JPanel();
         infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.Y_AXIS));
         infoPanel.setOpaque(false);
 
+       
         JLabel titleLbl = new JLabel(name.toUpperCase());
         titleLbl.setFont(new Font("SansSerif", Font.BOLD, 55));
         titleLbl.setForeground(Color.WHITE);
+        titleLbl.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        JLabel metaLbl = new JLabel("\u2B50 " + rating + "  |  2026  |  Action, Sci-Fi  |  4K");
+        JLabel metaLbl = new JLabel("\u2B50 " + rating + "  |  2026  |  4K Ultra HD");
         metaLbl.setFont(new Font("SansSerif", Font.PLAIN, 18));
         metaLbl.setForeground(Theme.TEXT_GRAY);
+        metaLbl.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        // Fixed width for description to prevent horizontal scroll
-        JLabel descLbl = new JLabel("<html><body style='width: 500px; color: #BBBBBB; font-size: 15px;'>" + overview + "</body></html>");
+        JLabel descLbl = new JLabel("<html><body style='width: 450px; color: #DDDDDD; font-size: 15px; line-height: 1.6;'>" 
+            + overview + "</body></html>");
+        descLbl.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        // Action Buttons
+      
         JPanel btnPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 30));
         btnPanel.setOpaque(false);
+        btnPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        JButton playBtn = new JButton("\u25B6 WATCH TRAILER");
-        playBtn.setPreferredSize(new Dimension(220, 55));
-        playBtn.setFont(new Font("SansSerif", Font.BOLD, 14));
+        JButton playBtn = new JButton("\u25B6  WATCH TRAILER");
+        playBtn.setPreferredSize(new Dimension(200, 50));
+        playBtn.setFont(new Font("SansSerif", Font.BOLD, 13));
         playBtn.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        
-        // playBtn.addActionListener(e -> {
-        //     new Thread(() -> {
-        //         String key = TMDBService.getTrailerUrl(id);
-        //         dashboard.playTrailer(key);
-        //     }).start();
-        // });
-playBtn.addActionListener(e -> {
-    // ১. TMDB ID টি নিন
-    int tmdbId = id; 
-    
-    // ২. স্ট্রিমিং ইউআরএল জেনারেট করুন (ইউটিউব ছাড়া)
-    String streamUrl = TMDBService.getLiveStreamingUrl(tmdbId, false);
-    
-    // ৩. প্লেয়ারে পাঠিয়ে দিন
-    dashboard.playTrailer(streamUrl); // এখন এটি সরাসরি স্ট্রীম প্লে করবে
-});
+        playBtn.addActionListener(e -> {
+            new Thread(() -> {
+                String key = TMDBService.getTrailerKey(id);
+                dashboard.playTrailer(key);
+            }).start();
+        });
+
         JButton bookBtn = new JButton("BOOK TICKETS");
         bookBtn.setBackground(Theme.PRIMARY_RED);
         bookBtn.setForeground(Color.WHITE);
-        bookBtn.setPreferredSize(new Dimension(220, 55));
-        bookBtn.setFont(new Font("SansSerif", Font.BOLD, 14));
+        bookBtn.setPreferredSize(new Dimension(200, 50));
+        bookBtn.setFont(new Font("SansSerif", Font.BOLD, 13));
         bookBtn.setCursor(new Cursor(Cursor.HAND_CURSOR));
         bookBtn.addActionListener(e -> dashboard.navigateTo("BUY_TICKETS"));
 
         btnPanel.add(playBtn);
-        btnPanel.add(Box.createRigidArea(new Dimension(25, 0)));
+        btnPanel.add(Box.createRigidArea(new Dimension(20, 0)));
         btnPanel.add(bookBtn);
 
+   
         infoPanel.add(titleLbl);
         infoPanel.add(Box.createRigidArea(new Dimension(0, 10)));
         infoPanel.add(metaLbl);
@@ -90,9 +105,8 @@ playBtn.addActionListener(e -> {
         infoPanel.add(descLbl);
         infoPanel.add(btnPanel);
 
-        gbc.gridx = 1;
-        gbc.weightx = 1.0;
-        gbc.insets = new Insets(0, 0, 0, 0);
-        add(infoPanel, gbc);
+        mainWrapper.add(infoPanel, BorderLayout.CENTER);
+
+        add(mainWrapper, BorderLayout.CENTER);
     }
 }

@@ -1,7 +1,6 @@
 package com.cinetick.ui.components;
 
 import com.cinetick.ui.MainDashboard;
-import com.cinetick.ui.theme.Theme;
 import javax.swing.*;
 import java.awt.*;
 
