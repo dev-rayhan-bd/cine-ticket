@@ -6,13 +6,12 @@ import java.sql.*;
 
 public class UserDAO {
 
- public static boolean register(User user) {
+public static boolean register(User user) {
     String sql = "INSERT INTO users (name, email, password, profile_pic, otp_code) VALUES (?, ?, ?, ?, ?)";
     try (Connection con = DatabaseConfig.getConnection();
          PreparedStatement pst = con.prepareStatement(sql)) {
         
         String hashedPw = org.mindrot.jbcrypt.BCrypt.hashpw(user.password, org.mindrot.jbcrypt.BCrypt.gensalt());
-      
         String otp = String.valueOf((int)(Math.random() * 900000) + 100000); 
         
         pst.setString(1, user.name);
@@ -23,17 +22,15 @@ public class UserDAO {
         
         int res = pst.executeUpdate();
         if (res > 0) {
-        
-            System.out.println("\n-------------------------------------------");
-            System.out.println("📩 DEBUG: OTP for " + user.email + " is: " + otp);
-            System.out.println("-------------------------------------------\n");
+       
+            com.cinetick.service.EmailService.sendOTP(user.email, user.name, otp);
+            
+            System.out.println("📩 DEBUG: OTP printed in terminal and sent to email.");
             return true;
         }
     } catch (Exception e) { e.printStackTrace(); }
     return false;
 }
-
-  
     public static boolean verifyOTP(String email, String code) {
         String sql = "UPDATE users SET is_verified = TRUE, otp_code = NULL WHERE email = ? AND otp_code = ?";
         try (Connection con = DatabaseConfig.getConnection();
@@ -66,5 +63,18 @@ public static User login(String email, String password) {
 }
 
 
-
+public static User getUserByEmail(String email) {
+    String sql = "SELECT * FROM users WHERE email = ?";
+    try (Connection con = com.cinetick.config.DatabaseConfig.getConnection();
+         PreparedStatement pst = con.prepareStatement(sql)) {
+        pst.setString(1, email);
+        ResultSet rs = pst.executeQuery();
+        if (rs.next()) {
+            User user = new User(rs.getString("name"), rs.getString("email"), "", rs.getString("profile_pic"));
+            user.id = rs.getInt("id");
+            return user;
+        }
+    } catch (Exception e) { e.printStackTrace(); }
+    return null;
+}
 }

@@ -70,11 +70,11 @@ public class SignupScreen extends JPanel {
                 return;
             }
 
-            lastRegisteredEmail = emailTxt; // ওটিপি স্ক্রিনের জন্য ইমেইল সেভ করা হলো
+            lastRegisteredEmail = emailTxt; 
             User u = new User(nameTxt, emailTxt, passTxt, picPath);
             
             if (UserDAO.register(u)) {
-                JOptionPane.showMessageDialog(this, "OTP Sent! Please check your VS Code Terminal.");
+                JOptionPane.showMessageDialog(this, "OTP Sent! Please check your Email.");
                 WindowManager.showScreen("OTP_VERIFY");
             } else {
                 JOptionPane.showMessageDialog(this, "Email already exists or DB Error!");
